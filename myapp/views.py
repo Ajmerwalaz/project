@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.core.mail import send_mail
 from django.core.paginator import Paginator
 
-# Create your views here.
+# Create
 def blog_details(request):
     cid=category.objects.all().order_by("-id")
     contaxt={
