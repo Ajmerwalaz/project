@@ -39,12 +39,16 @@ def index(request):
     if "name" in request.session:
         uid=user.objects.get(name=request.session['name'])
         cid=category.objects.all().order_by("-id")
+        wid_count=wishlist.objects.filter(user=uid).count()
+        cid_count=Cart.objects.filter(user=uid).count()
         search_query = request.GET.get('query')
         if search_query:
             pid = pid.filter(name__icontains=search_query)           
         contaxt={
             "cid":cid,
             "uid":uid,
+            "wid_count": wid_count,
+            "cid_count": cid_count,
             "search_query": search_query,
         }
         return render(request, 'index.html' , contaxt)
@@ -121,14 +125,24 @@ def shoping_cart(request):
 
     # Get cart items for the user, including related product
     shop_items = Cart.objects.filter(user=uid).select_related('product')
-
+    l1=[i.total_price for i in shop_items]
+    sub_total=sum(l1)
+    if sub_total == 0:
+        shipping=0
+    else:
+        shipping=20
+    total=sub_total+shipping
     # Get categories
     cid = category.objects.all().order_by("-id")
 
     # Prepare context for the template
     context = {
         "cid": cid,
-        "shop_items": shop_items
+        "shop_items": shop_items,
+        "sub_total": sub_total,
+        "shipping": shipping,
+        "total": total,
+
     }
 
     return render(request, "shoping_cart.html", context)
