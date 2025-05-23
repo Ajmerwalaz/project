@@ -295,28 +295,28 @@
                                 {% for item in shop_items %}
                                 <tr>
                                     <td class="shoping__cart__item">
-                                        <img src="{% static 'img/cart/cart-1.jpg'%}" alt="">
+                                        <img src="{{item.product.image}}" alt="">
                                         <h5>{{ item.product.name }}</h5>
                                     </td>
                                     <td class="shoping__cart__price">
                                         {{item.product.price}}
                                     </td>
                                     <td class="shoping__cart__quantity">
-    <div class="quantity">
-        <div class="pro-qty">
-            <a href="{% url 'cart_minus' item.id %}" class="qty-btn">−</a>
-            <input type="text" value="{{ item.quantity }}" class="qty-input" readonly>
-            <a href="{% url 'cart_plus' item.id %}" class="qty-btn">+</a>
-        </div>
-    </div>
-</td>
-
-
+                                        <div class="quantity">
+                                            <div class="pro-qty">
+                                                <a href="{% url 'cart_minus' item.id %}" class="qty-btn">−</a>
+                                                <input type="text" value="{{ item.quantity }}" class="qty-input" readonly>
+                                                <a href="{% url 'cart_plus' item.id %}" class="qty-btn">+</a>
+                                            </div>
+                                        </div>
+                                    </td>
                                     <td class="shoping__cart__total">
                                         {{item.total_price}}
                                     </td>
                                     <td class="shoping__cart__item__close">
+                                        <a href="{% url 'add_cart' item.product.id %}">
                                         <span class="icon_close"></span>
+                                        </a>
                                     </td>
                                 </tr>
                                 {% empty %}

@@ -91,9 +91,9 @@ def shop_grid(request):
         pid = pid.filter(category=cate)
     
     # Pagination
-    # pagination = Paginator(pid, 1)
-    # page = request.GET.get("page")
-    # pid = pagination.get_page(page)
+    pagination = Paginator(pid, 6)
+    page = request.GET.get("page")
+    pid = pagination.get_page(page)
 
     context = {
         "cid": cid,
@@ -318,7 +318,7 @@ def add_cart(request, id):
     uid = get_object_or_404(user, name=request.session['name'])
     pid = get_object_or_404(product, id=id)
 
-    existing = wishlist.objects.filter(user=uid, product=pid)
+    existing = Cart.objects.filter(user=uid, product=pid)
     if existing.exists():
         existing.delete()  # Remove from cart
     else:
@@ -342,7 +342,15 @@ def cart_plus(request,id):
 
 def cart_minus(request,id):
     cid=Cart.objects.get(id=id)
-    cid.quantity-=1
-    cid.total_price=cid.product.price*cid.quantity
-    cid.save()
-    return redirect(shoping_cart)
+    # cid.quantity-=1
+    # cid.total_price=cid.product.price*cid.quantity
+    # cid.save()
+    # return redirect(shoping_cart)
+    if cid.quantity > 1:
+        cid.quantity -= 1
+        cid.total_price = cid.quantity * cid.product.price
+        cid.save()
+    else:
+        cid.delete()  # Remove from cart if quantity is 1 and user clicks minus
+
+    return redirect('shoping_cart')
