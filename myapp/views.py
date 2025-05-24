@@ -8,30 +8,54 @@ from django.core.paginator import Paginator
 # Create
 def blog_details(request):
     cid=category.objects.all().order_by("-id")
+    uid=user.objects.get(name=request.session['name'])
+    wid_count=wishlist.objects.filter(user=uid).count()
+    cid_count=Cart.objects.filter(user=uid).count()
     contaxt={
-            "cid":cid
+            "cid":cid,
+            "wid_count": wid_count,
+            "cid_count": cid_count,
+            "uid":uid,
         }
     
     return render(request, 'blog_details.html', contaxt)
 
 def blog(request):
     cid=category.objects.all().order_by("-id")
+    uid=user.objects.get(name=request.session['name'])
+    wid_count=wishlist.objects.filter(user=uid).count()
+    cid_count=Cart.objects.filter(user=uid).count()
     contaxt={
-            "cid":cid
+            "cid":cid,
+            "wid_count": wid_count,
+            "cid_count": cid_count,
+            "uid":uid,
         }
     return render(request, 'blog.html', contaxt)
 
 def checkout(request):
     cid=category.objects.all().order_by("-id")
+    uid=user.objects.get(name=request.session['name'])
+    wid_count=wishlist.objects.filter(user=uid).count()
+    cid_count=Cart.objects.filter(user=uid).count()
     contaxt={
-            "cid":cid
+            "cid":cid,
+            "uid":uid,
+            "wid_count": wid_count,
+            "cid_count": cid_count,
         }
     return render(request, 'checkout.html', contaxt)
 
 def contact(request):
     cid=category.objects.all().order_by("-id")
+    uid=user.objects.get(name=request.session['name'])
+    wid_count=wishlist.objects.filter(user=uid).count()
+    cid_count=Cart.objects.filter(user=uid).count()
     contaxt={
-            "cid":cid
+            "cid":cid,
+            "wid_count": wid_count,
+            "cid_count": cid_count,
+            "uid":uid,
         }
     return render(request, 'contact.html', contaxt)
 
@@ -39,14 +63,29 @@ def index(request):
     if "name" in request.session:
         uid=user.objects.get(name=request.session['name'])
         cid=category.objects.all().order_by("-id")
+        wishlist_items = []
+        wishlist_items = wishlist.objects.filter(user=uid).values_list('product_id', flat=True)
         wid_count=wishlist.objects.filter(user=uid).count()
         cid_count=Cart.objects.filter(user=uid).count()
         search_query = request.GET.get('query')
+        pid = product.objects.all().order_by("-id")
+        # Handle category filter
+        cate = request.GET.get("cate")
+        if cate:
+            pid = pid.filter(category=cate)
+        
+        # Pagination
+        pagination = Paginator(pid, 2)
+        page = request.GET.get("page")
+        pid = pagination.get_page(page)
+
         if search_query:
-            pid = pid.filter(name__icontains=search_query)           
+            pid = pid.filter(name__icontains=search_query)       
         contaxt={
             "cid":cid,
             "uid":uid,
+            "pid": pid,
+            "wishlist_items": wishlist_items,
             "wid_count": wid_count,
             "cid_count": cid_count,
             "search_query": search_query,
@@ -60,13 +99,25 @@ def main(request):
 
 def shop_details(request):
     cid=category.objects.all().order_by("-id")
+    uid=user.objects.get(name=request.session['name'])
+    wid_count=wishlist.objects.filter(user=uid).count()
+    cid_count=Cart.objects.filter(user=uid).count()
+    pid = product.objects.all().order_by("-id")
+
     contaxt={
-        "cid":cid
-    }
+            "cid":cid,
+            "wid_count": wid_count,
+            "cid_count": cid_count,
+            "pid": pid,
+            "uid":uid,
+        }
     return render(request, 'shop_details.html',contaxt)
 
 def shop_grid(request):
     cid = category.objects.all().order_by("-id")
+    uid=user.objects.get(name=request.session['name'])
+    wid_count=wishlist.objects.filter(user=uid).count()
+    cid_count=Cart.objects.filter(user=uid).count()
     wishlist_items = []
     
     # Get wishlist items if user is logged in
@@ -95,13 +146,16 @@ def shop_grid(request):
         pid = pid.filter(category=cate)
     
     # Pagination
-    pagination = Paginator(pid, 6)
+    pagination = Paginator(pid, 2)
     page = request.GET.get("page")
     pid = pagination.get_page(page)
 
     context = {
         "cid": cid,
         "pid": pid,
+        "uid":uid,
+        "wid_count": wid_count,
+        "cid_count": cid_count,
         "wishlist_items": wishlist_items,
         "min_price": min_price if min_price else 10,
         "max_price": max_price if max_price else 540,
@@ -121,7 +175,11 @@ def shoping_cart(request):
         return redirect('login')
 
     # Get user instance
-    uid = get_object_or_404(user, name=request.session['name'])
+    uid=user.objects.get(name=request.session['name'])
+    wid_count=wishlist.objects.filter(user=uid).count()
+    cid_count=Cart.objects.filter(user=uid).count()
+    pid = product.objects.all().order_by("-id")
+
 
     # Get cart items for the user, including related product
     shop_items = Cart.objects.filter(user=uid).select_related('product')
@@ -138,6 +196,10 @@ def shoping_cart(request):
     # Prepare context for the template
     context = {
         "cid": cid,
+        "uid":uid,
+        "pid": pid,
+        "wid_count": wid_count,
+        "cid_count": cid_count,
         "shop_items": shop_items,
         "sub_total": sub_total,
         "shipping": shipping,
@@ -299,8 +361,8 @@ def add_wishlist(request, id):
     if 'name' not in request.session:
         return redirect('login')  # Not logged in
 
-    uid = get_object_or_404(user, name=request.session['name'])
-    pid = get_object_or_404(product, id=id)
+    uid=user.objects.get(name=request.session['name'])
+    pid = product.objects.filter(id=id).first()
 
     existing = wishlist.objects.filter(user=uid, product=pid)
     if existing.exists():
@@ -320,32 +382,41 @@ def wishlists(request):
     if 'name' not in request.session:
         return redirect('login')
 
-    uid = get_object_or_404(user, name=request.session['name'])
+    uid=user.objects.get(name=request.session['name'])
+    wid_count=wishlist.objects.filter(user=uid).count()
+    cid_count=Cart.objects.filter(user=uid).count()
     wishlist_items = wishlist.objects.filter(user=uid).select_related('product')
-    
-    return render(request, "wishlist1.html", {"wishlist_items": wishlist_items})
+    context = {
+        "uid":uid,
+        "wid_count": wid_count,
+        "cid_count": cid_count,
+        "wishlist_items": wishlist_items,
+        
+    }    
+    return render(request, "wishlist1.html", context)
 
 def add_cart(request, id):
     if 'name' not in request.session:
-        return redirect('login')  # Not logged in
+        return redirect('login')
 
-    uid = get_object_or_404(user, name=request.session['name'])
-    pid = get_object_or_404(product, id=id)
+    uid = user.objects.get(name=request.session['name'])
+    pid = product.objects.filter(id=id).first()
+    if not pid:
+        return redirect('shop_grid')  # Handle invalid product ID
 
-    existing = Cart.objects.filter(user=uid, product=pid)
-    if existing.exists():
-        existing.delete()  # Remove from cart
+    existing = Cart.objects.filter(user=uid, product=pid).first()
+
+    if existing:
+        existing.quantity += 1
+        existing.total_price = existing.quantity * pid.price
+        existing.save()
     else:
-        Cart.objects.create(user=uid, product=pid,quantity=1,total_price=pid.price)  # Add to cart
-
-    # return redirect('shop_grid')  # Or use request.META.get('HTTP_REFERER') to go back to same page
+        Cart.objects.create(user=uid, product=pid, quantity=1, total_price=pid.price)
     referer = request.META.get('HTTP_REFERER', '')
     if 'shoping_cart' in referer:
-        return redirect('shoping_cart')  # your cart page URL name
+        return redirect('shoping_cart')
     else:
-        return redirect('shop_grid')  # fallback if not from cart
-
-
+        return redirect('shop_grid')
 
 def cart_plus(request,id):
     cid=Cart.objects.get(id=id)
