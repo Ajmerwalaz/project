@@ -187,6 +187,8 @@ def shoping_cart(request):
     sub_total=sum(l1)
     if sub_total == 0:
         shipping=0
+    elif sub_total > 99:
+        shipping=0
     else:
         shipping=20
     total=sub_total+shipping
@@ -437,5 +439,18 @@ def cart_minus(request,id):
         cid.save()
     else:
         cid.delete()  # Remove from cart if quantity is 1 and user clicks minus
+
+    return redirect('shoping_cart')
+
+def remove_cart_item(request, id):
+    if 'name' not in request.session:
+        return redirect('login')
+
+    uid = user.objects.get(name=request.session['name'])
+    pid = product.objects.filter(id=id).first()
+    
+    cart_item = Cart.objects.filter(user=uid, product=pid).first()
+    if cart_item:
+        cart_item.delete()
 
     return redirect('shoping_cart')
