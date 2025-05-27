@@ -45,3 +45,18 @@ class Cart(models.Model):
     added_at = models.DateTimeField(auto_now_add=True)  
     def __str__(self):
         return f"{self.user.name} - {self.product.name} (x{self.quantity})"
+    
+class Billing_Details(models.Model):
+    user = models.ForeignKey(user, on_delete=models.CASCADE)
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    country = models.CharField(max_length=50)
+    address = models.TextField()
+    city = models.CharField(max_length=50)
+    state = models.CharField(max_length=50)
+    zip_code = models.CharField(max_length=20)
+    phone_number = models.CharField(max_length=15)
+    email = models.EmailField(max_length=50)
+
+    def __str__(self):
+        return f"{self.user.name} - {self.first_name} {self.last_name}"

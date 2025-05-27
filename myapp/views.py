@@ -464,3 +464,49 @@ def remove_cart_item(request, id):
         cart_item.delete()
 
     return redirect('shoping_cart')
+
+def add_billing(request):
+
+
+
+
+    if 'name' not in request.session:
+        return redirect('login')
+
+
+    uid = user.objects.get(name=request.session['name'])
+    wid_count = wishlist.objects.filter(user=uid).count()
+    cid_count = Cart.objects.filter(user=uid).count()
+    
+    if request.POST:
+        first_name = request.POST['first_name']
+        last_name = request.POST['last_name']
+        country = request.POST['country']
+        address = request.POST['address']
+        city = request.POST['city']
+        state = request.POST['state']
+        zip_code = request.POST['zip_code']
+        phone_number = request.POST['phone_number']
+        email = request.POST['email']
+
+        Billing_Details.objects.create(
+            user=uid,
+            first_name=first_name,
+            last_name=last_name,
+            country=country,
+            address=address,
+            city=city,
+            state=state,
+            zip_code=zip_code,
+            phone_number=phone_number,
+            email=email
+        )
+        messages.success(request, "Billing details saved successfully.")
+        return redirect('checkout')
+
+    context = {
+        "uid": uid,
+        "wid_count": wid_count,
+        "cid_count": cid_count
+    }
+    return render(request, 'checkout.html', context)
