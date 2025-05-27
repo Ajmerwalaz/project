@@ -38,11 +38,21 @@ def checkout(request):
     uid=user.objects.get(name=request.session['name'])
     wid_count=wishlist.objects.filter(user=uid).count()
     cid_count=Cart.objects.filter(user=uid).count()
+    cart_items = Cart.objects.filter(user=uid).select_related('product')
+
+    subtotal = sum(item.total_price for item in cart_items)
+    shipping = 0 if subtotal > 99 else 20
+    total = subtotal + shipping
+
     contaxt={
             "cid":cid,
             "uid":uid,
             "wid_count": wid_count,
             "cid_count": cid_count,
+            "cart_items": cart_items,
+            "subtotal": subtotal,
+            "shipping": shipping,
+            "total": total,
         }
     return render(request, 'checkout.html', contaxt)
 
