@@ -4,7 +4,7 @@ import random
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.core.paginator import Paginator
-
+import uuid
 # Create
 def blog_details(request):
     cid=category.objects.all().order_by("-id")
@@ -467,9 +467,6 @@ def remove_cart_item(request, id):
 
 def add_billing(request):
 
-
-
-
     if 'name' not in request.session:
         return redirect('login')
 
@@ -477,6 +474,8 @@ def add_billing(request):
     uid = user.objects.get(name=request.session['name'])
     wid_count = wishlist.objects.filter(user=uid).count()
     cid_count = Cart.objects.filter(user=uid).count()
+    cid = Cart.objects.filter(user=uid)
+    subtotal=sum([i.total_price for i in cid])
     
     if request.POST:
         first_name = request.POST['first_name']
@@ -502,6 +501,10 @@ def add_billing(request):
             email=email
         )
         messages.success(request, "Billing details saved successfully.")
+        latest_address=Billing_Details.objects.filter(user=uid).order_by("-id")[0]
+        order_id = str(uuid.uuid4()).replace('-', '')[:12]
+        oid=order.objects.create(user=uid,address=latest_address,subtotal=subtotal,total=subtotal,order_id=order_id)
+        oid.product.set(cid)
         return redirect('checkout')
 
     context = {
@@ -510,3 +513,22 @@ def add_billing(request):
         "cid_count": cid_count
     }
     return render(request, 'checkout.html', context)
+
+def order_detail(request):
+    if 'name' not in request.session:
+        return redirect('login')
+
+    uid = user.objects.get(name=request.session['name'])
+    orders = order.objects.filter(user=uid).order_by('-datetime')
+
+    context = {
+        "orders": orders,
+    }
+    return render(request, 'order_list.html', context)
+
+def single_orders (request,id):
+    oid=order.objects.get(id=id)
+    con={
+        "oid":oid
+    }
+    return render (request, "single_order.html",con)
