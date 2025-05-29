@@ -55,7 +55,8 @@
                     <li><a href="{% url 'wishlists'%}"><i class="fa fa-heart"></i> <span>{{wid_count}}</span></a></li>
                     <li><a href="{% url 'shoping_cart' %}"><i class="fa fa-shopping-bag"></i> <span>{{cid_count}}</span></a></li>
                 </ul>
-            <div class="header__cart__price">item: <span>$150.00</span></div>
+                
+            <div class="header__cart__price">item: <span>${{total}}</span></div>
         </div>
         <div class="humberger__menu__widget">
             <div class="header__top__right__language">
@@ -182,10 +183,11 @@
                     <li><a href="{% url 'wishlists' %}"><i class="fa fa-heart"></i> <span>{{wid_count}}</span></a></li>
                     <li><a href="{% url 'shoping_cart' %}"><i class="fa fa-shopping-bag"></i> <span>{{cid_count}}</span></a></li>
                 </ul>
-                        <div class="header__cart__price">item: <span>$150.00</span></div>
+                        <div class="header__cart__price">item: <span>${{total}}</span></div>
                     </div>
                 </div>
             </div>
+            
             <div class="humberger__open">
                 <i class="fa fa-bars"></i>
             </div>
@@ -244,7 +246,7 @@
             <div class="row">
                 <div class="col-lg-12 text-center">
                     <div class="breadcrumb__text">
-                        <h2>Shopping Cart</h2>
+                        <h2>Your Orders</h2>
                         <div class="breadcrumb__option">
                             <a href="{% url 'index' %}">Home</a>
                             <span>Your Orders</span>
@@ -284,18 +286,13 @@
                                     </td>
                                     <td class="shoping__cart__quantity">
                                         <div class="quantity">
-                                            <div class="pro-qty">
+                                            {% comment %} <div class="pro-qty"> {% endcomment %}
                                                 <input type="text" value="{{ item.quantity }}" class="qty-input" readonly>
                                             </div>
                                         </div>
                                     </td>
                                     <td class="shoping__cart__total">
                                         {{item.total_price}}
-                                    </td>
-                                    <td class="shoping__cart__item__close">
-                                        <a href="{% url 'remove_cart_item' item.product.id %}">
-                                        <span class="icon_close"></span>
-                                        </a>
                                     </td>
                                 </tr>
                                 
