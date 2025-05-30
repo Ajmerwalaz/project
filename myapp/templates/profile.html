@@ -62,6 +62,9 @@
     </style>
 </head>
 <body>
+    <a href="javascript:history.back()" style="position: absolute; top: 20px; left: 20px; font-size: 24px; color: #333;">
+        <i class="fas fa-arrow-left"></i>
+    </a>
     <div class="main-container">
         
         <div class="content">
@@ -90,8 +93,12 @@
                     <label for="image" class="form-label">Image</label>
                     <input type="file" class="form-control" id="image" name="image">
                 </div>
-                
+                <div class="mb-3">
                 <button type="submit" class="btn btn-custom">Save Changes</button>
+                </div>
+                <div class="mb-3">
+                <a href="{% url 'order_detail' %}" class="btn btn-custom">Orders</a>
+                </div>
             </form>
         </div>
     </div>

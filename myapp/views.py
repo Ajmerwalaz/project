@@ -85,6 +85,20 @@ def contact(request):
     sub_total = sum(l1)
     shipping = 0 if sub_total == 0 or sub_total > 99 else 20
     total = sub_total + shipping
+
+    # ✅ Handle form submission
+    if request.method == "POST":
+        name = request.POST.get("name")
+        email = request.POST.get("email")
+        message = request.POST.get("message")
+
+        # Save to model
+        contact_us.objects.create(
+            name=name,
+            email=email,
+            message=message
+        )
+        messages.success(request, "Your message has been sent!")
     contaxt={
             "cid":cid,
             "wid_count": wid_count,
@@ -480,7 +494,7 @@ def add_cart(request, id):
     if not pid:
         return redirect('shop_grid')  # Handle invalid product ID
 
-    existing = Cart.objects.filter(user=uid, product=pid).first()
+    existing = Cart.objects.filter(user=uid, product=pid,order_status=False).first()
 
     if existing:
         existing.quantity += 1

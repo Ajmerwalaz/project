@@ -69,3 +69,12 @@ class order(models.Model):
     total=models.IntegerField()
     order_id=models.CharField(max_length=100)
     datetime=models.DateTimeField(auto_now_add=True)
+
+class contact_us(models.Model):
+    name=models.CharField(max_length=50)
+    email=models.EmailField(max_length=50)
+    message=models.CharField(max_length=250)
+    submitted_at=models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name

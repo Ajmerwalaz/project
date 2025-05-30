@@ -60,9 +60,9 @@
             <div class="header__top__right__language">
                 <img src="{% static 'img/language.png'%}" alt="">
                 <div>English</div>
-                <span class="arrow_carrot-down"></span>
+                
                 <ul>
-                    <li><a href="#">Spanis</a></li>
+                    
                     <li><a href="#">English</a></li>
                 </ul>
             </div>
@@ -131,16 +131,16 @@
                             <div class="header__top__right__language">
                                 <img src="{% static 'img/language.png'%}" alt="">
                                 <div>English</div>
-                                <span class="arrow_carrot-down"></span>
+                                
                                 <ul>
-                                    <li><a href="#">Spanis</a></li>
+                                    
                                     <li><a href="#">English</a></li>
                                 </ul>
                             </div>
-                  <div class="header__top__right__auth">
+            <div class="header__top__right__auth">
                    <a href="{% url 'profile' %}" title="View Profile">
-        <img src="{{ uid.image.url }}" alt="User" class="profile-icon">
-    <href="{% url 'logout' %}">Logout</a>
+                     <img src="{{ uid.image.url }}" alt="User" class="profile-icon"></a>    
+                    <a href="{% url 'logout' %}">Logout</a>
             </div>
                         </div>
                     </div>
