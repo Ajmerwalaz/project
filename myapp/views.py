@@ -62,7 +62,10 @@ def checkout(request):
     subtotal = sum(item.total_price for item in cart_items)
     shipping = 0 if subtotal > 99 else 20
     total = subtotal + shipping
-
+    print(total)
+    amount = int(total)*100 #100 here means 1 dollar,1 rupree if currency INR
+    client = razorpay.Client(auth=('rzp_test_bilBagOBVTi4lE','77yKq3N9Wul97JVQcjtIVB5z'))
+    response = client.order.create({'amount':amount,'currency':'INR','payment_capture':1})
     contaxt={
             "cid":cid,
             "uid":uid,
@@ -72,6 +75,7 @@ def checkout(request):
             "subtotal": subtotal,
             "shipping": shipping,
             "total": total,
+            "response": response,
         }
     return render(request, 'checkout.html', contaxt)
 
@@ -543,6 +547,7 @@ def remove_cart_item(request, id):
 
     return redirect('shoping_cart')
 
+import razorpay
 def add_billing(request):
 
     if 'name' not in request.session:
@@ -589,10 +594,14 @@ def add_billing(request):
 
         return redirect('checkout')
 
+    amount = subtotal*100 #100 here means 1 dollar,1 rupree if currency INR
+    client = razorpay.Client(auth=('rzp_test_bilBagOBVTi4lE','77yKq3N9Wul97JVQcjtIVB5z'))
+    response = client.order.create({'amount':amount,'currency':'INR','payment_capture':1})
     context = {
         "uid": uid,
         "wid_count": wid_count,
-        "cid_count": cid_count
+        "cid_count": cid_count,
+        "response": response,
     }
     return render(request, 'checkout.html', context)
 
