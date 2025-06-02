@@ -66,6 +66,12 @@ def checkout(request):
     amount = int(total)*100 #100 here means 1 dollar,1 rupree if currency INR
     client = razorpay.Client(auth=('rzp_test_bilBagOBVTi4lE','77yKq3N9Wul97JVQcjtIVB5z'))
     response = client.order.create({'amount':amount,'currency':'INR','payment_capture':1})
+    if subtotal == 0:
+        shipping=0
+    elif subtotal > 99:
+        shipping=0
+    else:
+        shipping=20
     contaxt={
             "cid":cid,
             "uid":uid,
